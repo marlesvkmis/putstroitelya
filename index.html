@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Северный Предел — мир Основы</title>
+<style>
+  :root{
+    --bg:#0f1216; --panel:#171c23; --panel2:#1e252e; --line:#2b3440;
+    --text:#e6e9ee; --muted:#9aa6b5; --acc:#c9a227; --acc2:#5aa9e6;
+    --sod:#6fbf73; --raz:#d9534f;
+    --r:12px; --shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  header{position:sticky;top:0;z-index:50;background:rgba(15,18,22,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:14px 20px;flex-wrap:wrap}
+  .logo{font-weight:700;letter-spacing:.5px;font-size:18px}
+  .logo span{color:var(--acc)}
+  .nav a.link{color:var(--muted);font-size:14px;padding:6px 2px;border-bottom:2px solid transparent;cursor:pointer}
+  .nav a.link:hover,.nav a.link.active{color:var(--text);border-color:var(--acc)}
+  .nav .spacer{flex:1}
+  .btn{background:var(--acc);color:#1a1400;border:none;padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .btn.small{padding:6px 11px;font-size:13px}
+  .btn:hover{filter:brightness(1.08)}
+  main{max-width:1240px;margin:0 auto;padding:26px 20px 70px}
+  .view{display:none}
+  .view.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h1{font-size:30px;margin:0 0 6px}
+  h2{font-size:20px;margin:28px 0 14px}
+  .muted{color:var(--muted)}
+  .hero{background:radial-gradient(1200px 400px at 20% -10%,rgba(201,162,39,.18),transparent),linear-gradient(160deg,#1a212a,#12161b);border:1px solid var(--line);border-radius:18px;padding:34px;margin-bottom:26px}
+  .hero h1{font-size:36px;max-width:760px}
+  .hero p{max-width:640px;color:var(--muted)}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .badge{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel2)}
+  .badge.sod{color:var(--sod);border-color:rgba(111,191,115,.4)}
+  .badge.raz{color:var(--raz);border-color:rgba(217,83,79,.4)}
+  .grid{display:grid;gap:16px}
+  .g3{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:.2s}
+  .card:hover{transform:translateY(-3px);border-color:#3a4656;box-shadow:var(--shadow)}
+  .thumb{height:140px;display:flex;align-items:center;justify-content:center;font-size:34px;background:linear-gradient(135deg,#232c37,#1a2028)}
+  .card .body{padding:13px 15px}
+  .card h3{margin:0 0 4px;font-size:16px}
+  .card .meta{font-size:12px;color:var(--muted)}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);margin:2px 3px 0 0;color:var(--muted)}
+  .filters{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:20px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  .filters label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+  select,input,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:9px 11px;border-radius:9px;font-size:14px;font-family:inherit}
+  textarea{min-height:90px;resize:vertical}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .tab{padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-size:14px;color:var(--muted)}
+  .tab.active{background:var(--acc);color:#1a1400;border-color:var(--acc);font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:620px;width:100%;max-height:86vh;overflow:auto;padding:26px;box-shadow:var(--shadow)}
+  .modal h2{margin-top:0}
+  .close{float:right;cursor:pointer;color:var(--muted);font-size:22px;line-height:1}
+  .media-type{display:inline-flex;gap:5px;align-items:center;font-size:12px;padding:3px 9px;border-radius:999px;background:#243040;color:#9cc3e6}
+  .author-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:18px}
+  .form-grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+  .form-grid .full{grid-column:1/-1}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+  .chip{padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);font-size:13px;cursor:pointer;user-select:none}
+  .chip.on{background:var(--acc);color:#1a1400;border-color:var(--acc);font-weight:600}
+  .empty{color:var(--muted);padding:30px;text-align:center;border:1px dashed var(--line);border-radius:var(--r)}
+  .timeline{border-left:2px solid var(--line);margin-left:10px;padding-left:20px}
+  .tl-item{position:relative;margin-bottom:18px}
+  .tl-item::before{content:'';position:absolute;left:-27px;top:6px;width:11px;height:11px;border-radius:50%;background:var(--acc);border:2px solid var(--bg)}
+  .map-box{position:relative;height:380px;border-radius:var(--r);border:1px solid var(--line);background:
+    radial-gradient(circle at 30% 40%,rgba(90,169,230,.12),transparent 40%),
+    radial-gradient(circle at 70% 65%,rgba(201,162,39,.12),transparent 40%),
+    repeating-linear-gradient(45deg,#161c23,#161c23 10px,#181f27 10px,#181f27 20px);
+    overflow:hidden}
+  .map-pin{position:absolute;transform:translate(-50%,-50%);background:var(--panel2);border:1px solid var(--acc);color:var(--text);padding:5px 10px;border-radius:999px;font-size:12px;cursor:pointer;white-space:nowrap}
+  .map-pin:hover{background:var(--acc);color:#1a1400}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:#26313d;border:1px solid var(--acc);color:var(--text);padding:12px 20px;border-radius:12px;z-index:200;transition:.35s;font-size:14px}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  footer{border-top:1px solid var(--line);margin-top:40px;padding:26px 20px;text-align:center;color:var(--muted);font-size:13px}
+  @media(max-width:640px){.form-grid{grid-template-columns:1fr}.hero h1{font-size:26px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">СЕВЕРНЫЙ <span>ПРЕДЕЛ</span></div>
+    <a class="link active" data-view="home">Главная</a>
+    <a class="link" data-view="media">Архив мира</a>
+    <a class="link" data-view="catalogs">Каталоги</a>
+    <a class="link" data-view="map">Карта</a>
+    <a class="link" data-view="author">Кабинет автора</a>
+    <a class="link" data-view="reader">Кабинет читателя</a>
+    <div class="spacer"></div>
+    <button class="btn ghost small" onclick="toast('Вход в демо-режиме')">Войти</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= ГЛАВНАЯ ================= -->
+<section class="view active" id="view-home">
+  <div class="hero">
+    <div class="badges">
+      <span class="badge">Север</span><span class="badge">Деревня Студёный Брод</span>
+      <span class="badge sod">Созидание</span><span class="badge raz">Разрушение</span>
+    </div>
+    <h1>Мир, где Основа течёт сквозь всё. И мальчик, которому досталось два Пути.</h1>
+    <p>Подмастерье строителя, рождённый в нашем мире, просыпается в теле подростка на северной окраине. Впервые за столетия мир получает Созидателя — и сразу же получает разрушителя в том же человеке. Чтобы взойти на новую ступень, ему придётся пройти оба Пути до конца.</p>
+    <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="go('media')">Открыть Архив мира</button>
+      <button class="btn ghost" onclick="go('catalogs')">Смотреть каталоги</button>
+    </div>
+  </div>
+
+  <h2>Свежие материалы</h2>
+  <div class="grid g3" id="home-latest"></div>
+
+  <h2>Персонажи</h2>
+  <div class="grid g4" id="home-chars"></div>
+
+  <h2>Места</h2>
+  <div class="grid g4" id="home-places"></div>
+
+  <h2>Хроника</h2>
+  <div class="timeline" id="home-timeline"></div>
+</section>
+
+<!-- ================= АРХИВ / МЕДИАТЕКА ================= -->
+<section class="view" id="view-media">
+  <h1>Архив мира</h1>
+  <p class="muted">Фото, видео, аудио и тексты — с привязкой к персонажам, местам и событиям.</p>
+
+  <div class="filters">
+    <div><label>Персонаж</label><select id="f-char"><option value="">Все</option></select></div>
+    <div><label>Место</label><select id="f-place"><option value="">Все</option></select></div>
+    <div><label>Событие</label><select id="f-event"><option value="">Все</option></select></div>
+    <div><label>Автор</label><select id="f-author"><option value="">Все</option></select></div>
+    <div><label>Тип контента</label><select id="f-type">
+      <option value="">Все</option><option>Фото</option><option>Видео</option><option>Аудио</option><option>Текст</option></select></div>
+    <div><label>Дата публикации</label><select id="f-date">
+      <option value="">За всё время</option><option value="7">За неделю</option><option value="30">За месяц</option><option value="365">За год</option></select></div>
+    <div><label>Путь</label><select id="f-path"><option value="">Любой</option><option>Созидание</option><option>Разрушение</option><option>Двойной</option></select></div>
+    <div><label>Статус</label><select id="f-canon"><option value="">Любой</option><option>Канон</option><option>Фанатское</option><option>Черновик</option></select></div>
+    <div><label>Сортировка</label><select id="f-sort"><option value="new">Сначала новые</option><option value="old">Сначала старые</option><option value="pop">По популярности</option></select></div>
+    <div style="grid-column:1/-1"><label>Поиск по названию / тегам</label><input id="f-q" placeholder="например: шахта, ритуал, ученик…"></div>
+  </div>
+
+  <div id="media-feed" class="grid g3"></div>
+</section>
+
+<!-- ================= КАТАЛОГИ ================= -->
+<section class="view" id="view-catalogs">
+  <h1>Каталоги</h1>
+  <div class="tabs">
+    <div class="tab active" data-cat="chars">Персонажи</div>
+    <div class="tab" data-cat="places">Места</div>
+    <div class="tab" data-cat="events">События</div>
+    <div class="tab" data-cat="glossary">Глоссарий</div>
+  </div>
+  <div id="catalog-body"></div>
+</section>
+
+<!-- ================= КАРТА ================= -->
+<section class="view" id="view-map">
+  <h1>Карта</h1>
+  <p class="muted">Пока — схематичная карта с маркерами. Интеграция с существующей картой автора обсуждается отдельно (можно встроить iframe или загрузить изображение/тайлы).</p>
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:18px" id="map-layout">
+    <div class="map-box" id="map-box"></div>
+    <div id="map-list"></div>
+  </div>
+</section>
+
+<!-- ================= КАБИНЕТ АВТОРА ================= -->
+<section class="view" id="view-author">
+  <h1>Личный кабинет автора</h1>
+  <p class="muted">Загружайте медиа и привязывайте его к персонажам, местам и событиям.</p>
+
+  <div class="author-box">
+    <h2 style="margin-top:0">Новый материал</h2>
+    <div class="form-grid">
+      <div class="full"><label>Название</label><input id="a-title" placeholder="Например: Первый обвал в шахте"></div>
+      <div><label>Тип контента</label><select id="a-type"><option>Фото</option><option>Видео</option><option>Аудио</option><option>Текст</option></select></div>
+      <div><label>Автор</label><input id="a-author" value="Вы (автор)" disabled></div>
+      <div><label>Файл (фото/видео/аудио)</label><input type="file" id="a-file"></div>
+      <div><label>Дата публикации</label><input type="date" id="a-date"></div>
+      <div class="full"><label>Описание / текст</label><textarea id="a-desc" placeholder="Короткое описание или сам текст материала"></textarea></div>
+      <div class="full"><label>Привязка к персонажам</label><div class="chips" id="a-chars"></div></div>
+      <div class="full"><label>Привязка к местам</label><div class="chips" id="a-places"></div></div>
+      <div class="full"><label>Привязка к событиям</label><div class="chips" id="a-events"></div></div>
+      <div class="full"><label>Теги (через запятую)</label><input id="a-tags" placeholder="шахта, обвал, ученик"></div>
+      <div><label>Путь</label><select id="a-path"><option>—</option><option>Созидание</option><option>Разрушение</option><option>Двойной</option></select></div>
+      <div><label>Статус</label><select id="a-canon"><option>Канон</option><option>Фанатское</option><option>Черновик</option></select></div>
+      <div class="full"><button class="btn" onclick="addMaterial()">Опубликовать материал</button></div>
+    </div>
+  </div>
+
+  <h2>Мои материалы</h2>
+  <div style="overflow:auto"><table id="author-table">
+    <thead><tr><th>Название</th><th>Тип</th><th>Привязки</th><th>Статус</th><th>Дата</th><th></th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+
+  <h2>Создать сущность</h2>
+  <div class="tabs">
+    <div class="tab active" data-new="char">Персонаж</div>
+    <div class="tab" data-new="place">Место</div>
+    <div class="tab" data-new="event">Событие</div>
+  </div>
+  <div class="author-box" id="new-entity-form"></div>
+</section>
+
+<!-- ================= КАБИНЕТ ЧИТАТЕЛЯ ================= -->
+<section class="view" id="view-reader">
+  <h1>Личный кабинет читателя</h1>
+  <div class="grid g3">
+    <div class="card"><div class="body"><h3>Избранное</h3><p class="meta">Персонажи, места и материалы, отмеченные вами.</p><div class="chips" id="fav-chips"></div></div></div>
+    <div class="card"><div class="body"><h3>Подписки</h3><p class="meta">Авторы и сущности, за обновлениями которых вы следите.</p><span class="pill">Автор: Хранитель Севера</span><span class="pill">Место: Студёный Брод</span></div></div>
+    <div class="card"><div class="body"><h3>История</h3><p class="meta">Недавно просмотренные материалы.</p><span class="pill">Обвал в шахте</span><span class="pill">Портрет мальчика</span></div></div>
+  </div>
+</section>
+
+</main>
+
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-body"></div>
+</div>
+<div class="toast" id="toast"></div>
+<footer>Демо-прототип · Северный Предел · данные хранятся локально в браузере</footer>
+
+<script>
+/* ================= ДЕМО-ДАННЫЕ ================= */
+const DB = {
+  chars:[
+    {id:'c1',name:'Кай (мальчик-подмастерье)',role:'Главный герой',path:'Двойной',level:'Ступень I',desc:'Перерожденец из нашего мира. Работает подмастерьем у строителя. Первый Созидатель за столетия — и одновременно носитель Разрушения.',emoji:'🧒'},
+    {id:'c2',name:'Мастер Дорн',role:'Строитель, наставник',path:'—',level:'—',desc:'Суровый мастер, у которого Кай учится ремеслу. Не Практик, но знает о Основе больше, чем говорит.',emoji:'🔨'},
+    {id:'c3',name:'Старуха Вирта',role:'Травница',path:'Созидание',level:'Ступень II',desc:'Единственная Практик в деревне до появления Кая. Лечит и «сшивает» повреждённое.',emoji:'🌿'},
+    {id:'c4',name:'Гарм',role:'Сборщик податей',path:'Разрушение',level:'Ступень II',desc:'Приезжает с юга. Его Путь — Разрушение: ломает вещи, стены и людей. Считает Кая угрозой.',emoji:'⚔️'}
+  ],
+  places:[
+    {id:'p1',name:'Студёный Брод',type:'Деревня',desc:'Небольшая северная деревня на берегу реки. Дома из тёмного дерева, длинные зимы, короткое лето.',emoji:'🏘️'},
+    {id:'p2',name:'Шахта у Серой скалы',type:'Шахта',desc:'Заброшенная шахта, где добывали руду. В глубине — странные трещины, светящиеся по ночам.',emoji:'⛏️'},
+    {id:'p3',name:'Тракт Старых Камней',type:'Дорога',desc:'Древняя дорога, выложенная камнем. Идёт с севера на юг, через лес.',emoji:'🛤️'},
+    {id:'p4',name:'Дом строителя',type:'Здание',desc:'Мастерская и жильё Дорна. Здесь Кай постигает ремесло и впервые чувствует Основу.',emoji:'🏠'}
+  ],
+  events:[
+    {id:'e1',name:'Обвал в шахте',date:'Год 312, ранняя весна',place:'p2',chars:['c1','c2'],desc:'Кай впервые использует Основу — инстинктивно, чтобы удержать свод. Половина обвала остановлена, половина — ускорена.'},
+    {id:'e2',name:'Приезд Гарма',date:'Год 312, весна',place:'p1',chars:['c4'],desc:'Сборщик податей приезжает в деревню и замечает следы Основы у мальчика.'},
+    {id:'e3',name:'Первый урок Вирты',date:'Год 312, лето',place:'p4',chars:['c1','c3'],desc:'Вирта пытается объяснить Каю, что такое Путь — и понимает, что у него их два.'}
+  ],
+  media:[
+    {id:'m1',title:'Портрет Кая',type:'Фото',author:'Хранитель Севера',date:'2026-11-02',chars:['c1'],places:[],events:[],path:'Двойной',canon:'Канон',tags:['портрет','герой'],emoji:'🖼️',views:120,desc:'Первый набросок героя.'},
+    {id:'m2',title:'Шахта ночью (видео)',type:'Видео',author:'Хранитель Севера',date:'2026-11-05',chars:[],places:['p2'],events:['e1'],path:'Разрушение',canon:'Канон',tags:['шахта','обвал'],emoji:'🎞️',views:89,desc:'Атмосферная зарисовка места обвала.'},
+    {id:'m3',title:'Голос Вирты (аудио)',type:'Аудио',author:'Летописец',date:'2026-10-21',chars:['c3'],places:['p1'],events:[],path:'Созидание',canon:'Канон',tags:['вирта','травы'],emoji:'🎧',views:54,desc:'Запись «заговора» над травами.'},
+    {id:'m4',title:'Хроника обвала',type:'Текст',author:'Летописец',date:'2026-09-15',chars:['c1','c2'],places:['p2'],events:['e1'],path:'Двойной',canon:'Канон',tags:['обвал','хроника'],emoji:'📜',views:200,desc:'Подробное описание первого проявления Основы.'},
+    {id:'m5',title:'Фанатский арт: Гарм',type:'Фото',author:'Гость',date:'2026-08-30',chars:['c4'],places:[],events:['e2'],path:'Разрушение',canon:'Фанатское',tags:['гарм','арт'],emoji:'🎨',views:31,desc:'Как я вижу сборщика податей.'}
+  ],
+  glossary:[
+    {term:'Основа',def:'Невидимая сила, пронизывающая мир. Одни чувствуют её, другие — нет.'},
+    {term:'Практик',def:'Тот, кто умеет пользоваться Основой.'},
+    {term:'Путь',def:'Способ применения Основы. У каждого Практика свой: лечение, разрушение, строительство и т.д.'},
+    {term:'Ступень',def:'Уровень владения Путём. Для перехода нужны достижения по своему Пути.'},
+    {term:'Двойной Путь',def:'Редчайший случай: два Пути у одного Практика. У Кая — Созидание и Разрушение. Чтобы подняться, он должен достичь уровня по обоим.'}
+  ]
+};
+
+/* ================= РОУТИНГ ================= */
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.nav a.link').forEach(a=>a.classList.toggle('active',a.dataset.view===view));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(view==='map') renderMap();
+}
+document.querySelectorAll('.nav a.link').forEach(a=>a.onclick=()=>go(a.dataset.view));
+
+/* ================= УТИЛИТЫ ================= */
+const byId=(arr,id)=>arr.find(x=>x.id===id);
+const nameOf=(arr,id)=>{const x=byId(arr,id);return x?x.name:''};
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+/* ================= ГЛАВНАЯ ================= */
+function renderHome(){
+  document.getElementById('home-latest').innerHTML = DB.media.slice(0,3).map(mediaCard).join('');
+  document.getElementById('home-chars').innerHTML = DB.chars.map(c=>`
+    <div class="card" onclick="openChar('${c.id}')"><div class="thumb">${c.emoji}</div>
+    <div class="body"><h3>${esc(c.name)}</h3><div class="meta">${esc(c.role)}</div>
+    ${c.path!=='—'?`<span class="pill ${c.path==='Созидание'?'sod':c.path==='Разрушение'?'raz':''}">${c.path}</span>`:''}</div></div>`).join('');
+  document.getElementById('home-places').innerHTML = DB.places.map(p=>`
+    <div class="card" onclick="openPlace('${p.id}')"><div class="thumb">${p.emoji}</div>
+    <div class="body"><h3>${esc(p.name)}</h3><div class="meta">${esc(p.type)}</div></div></div>`).join('');
+  document.getElementById('home-timeline').innerHTML = DB.events.map(e=>`
+    <div class="tl-item"><b>${esc(e.name)}</b> <span class="muted">· ${esc(e.date)}</span>
+    <div class="muted">${esc(e.desc)}</div></div>`).join('');
+}
+
+/* ================= АРХИВ ================= */
+function mediaCard(m){
+  return `<div class="card" onclick="openMedia('${m.id}')">
+    <div class="thumb">${m.emoji}</div>
+    <div class="body">
+      <span class="media-type">${m.type}</span>
+      <h3 style="margin-top:6px">${esc(m.title)}</h3>
+      <div class="meta">${esc(m.author)} · ${m.date}</div>
+      <div>${m.chars.map(id=>`<span class="pill">${esc(nameOf(DB.chars,id))}</span>`).join('')}
+           ${m.places.map(id=>`<span class="pill">${esc(nameOf(DB.places,id))}</span>`).join('')}
+           ${m.events.map(id=>`<span class="pill">${esc(nameOf(DB.events,id))}</span>`).join('')}</div>
+    </div></div>`;
+}
+function fillSelects(){
+  const fill=(id,arr)=>{const s=document.getElementById(id);s.innerHTML='<option value="">Все</option>'+arr.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')};
+  fill('f-char',DB.chars); fill('f-place',DB.places); fill('f-event',DB.events);
+  const auth=[...new Set(DB.media.map(m=>m.author))];
+  document.getElementById('f-author').innerHTML='<option value="">Все</option>'+auth.map(a=>`<option>${esc(a)}</option>`).join('');
+}
+function renderMedia(){
+  const v=id=>document.getElementById(id).value;
+  const q=v('f-q').toLowerCase();
+  const now=new Date('2026-11-16');
+  let list=DB.media.filter(m=>{
+    if(v('f-char')&&!m.chars.includes(v('f-char')))return false;
+    if(v('f-place')&&!m.places.includes(v('f-place')))return false;
+    if(v('f-event')&&!m.events.includes(v('f-event')))return false;
+    if(v('f-author')&&m.author!==v('f-author'))return false;
+    if(v('f-type')&&m.type!==v('f-type'))return false;
+    if(v('f-path')&&m.path!==v('f-path'))return false;
+    if(v('f-canon')&&m.canon!==v('f-canon'))return false;
+    if(v('f-date')){const d=(now-new Date(m.date))/86400000;if(d>+v('f-date'))return false}
+    if(q&&!(m.title.toLowerCase().includes(q)||m.tags.join(' ').toLowerCase().includes(q)||m.desc.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  const s=v('f-sort');
+  if(s==='new')list.sort((a,b)=>b.date.localeCompare(a.date));
+  if(s==='old')list.sort((a,b)=>a.date.localeCompare(b.date));
+  if(s==='pop')list.sort((a,b)=>b.views-a.views);
+  document.getElementById('media-feed').innerHTML = list.length?list.map(mediaCard).join(''):'<div class="empty">Ничего не найдено — попробуйте изменить фильтры.</div>';
+}
+['f-char','f-place','f-event','f-author','f-type','f-date','f-path','f-canon','f-sort'].forEach(id=>document.getElementById(id).onchange=renderMedia);
+document.getElementById('f-q').oninput=renderMedia;
+
+/* ================= КАТАЛОГИ ================= */
+let currentCat='chars';
+document.querySelectorAll('#view-catalogs .tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('#view-catalogs .tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active'); currentCat=t.dataset.cat; renderCatalog();
+});
+function renderCatalog(){
+  const b=document.getElementById('catalog-body');
+  if(currentCat==='chars'){
+    b.innerHTML='<div class="grid g3">'+DB.chars.map(c=>`
+      <div class="card" onclick="openChar('${c.id}')"><div class="thumb">${c.emoji}</div>
+      <div class="body"><h3>${esc(c.name)}</h3><div class="meta">${esc(c.role)}</div>
+      ${c.path!=='—'?`<span class="pill ${c.path==='Созидание'?'sod':c.path==='Разрушение'?'raz':''}">Путь: ${c.path}</span>`:''}
+      <span class="pill">${esc(c.level)}</span></div></div>`).join('')+'</div>';
+  } else if(currentCat==='places'){
+    b.innerHTML='<div class="grid g3">'+DB.places.map(p=>`
+      <div class="card" onclick="openPlace('${p.id}')"><div class="thumb">${p.emoji}</div>
+      <div class="body"><h3>${esc(p.name)}</h3><div class="meta">${esc(p.type)}</div><p class="muted" style="font-size:13px">${esc(p.desc)}</p></div></div>`).join('')+'</div>';
+  } else if(currentCat==='events'){
+    b.innerHTML='<div class="timeline">'+DB.events.map(e=>`
+      <div class="tl-item"><h3 style="margin:0">${esc(e.name)}</h3>
+      <div class="muted">${esc(e.date)} · ${esc(nameOf(DB.places,e.place))}</div>
+      <div>${e.chars.map(id=>`<span class="pill">${esc(nameOf(DB.chars,id))}</span>`).join('')}</div>
+      <p class="muted" style="font-size:13px">${esc(e.desc)}</p></div>`).join('')+'</div>';
+  } else {
+    b.innerHTML='<div class="grid g3">'+DB.glossary.map(g=>`
+      <div class="card"><div class="body"><h3>${esc(g.term)}</h3><p class="muted" style="font-size:13px">${esc(g.def)}</p></div></div>`).join('')+'</div>';
+  }
+}
+
+/* ================= МОДАЛКИ СУЩНОСТЕЙ ================= */
+function openModal(html){document.getElementById('modal-body').innerHTML='<span class="close" onclick="closeModal()">✕</span>'+html;document.getElementById('modal-bg').classList.add('open')}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open')}
+
+function openChar(id){
+  const c=byId(DB.chars,id);
+  const media=DB.media.filter(m=>m.chars.includes(id));
+  const events=DB.events.filter(e=>e.chars.includes(id));
+  openModal(`<h2>${c.emoji} ${esc(c.name)}</h2>
+    <p class="muted">${esc(c.role)}</p>
+    ${c.path!=='—'?`<span class="pill ${c.path==='Созидание'?'sod':c.path==='Разрушение'?'raz':''}">Путь: ${c.path}</span>`:''}
+    <span class="pill">${esc(c.level)}</span>
+    <p>${esc(c.desc)}</p>
+    <h3>Связанные события</h3>
+    ${events.length?events.map(e=>`<div class="pill">${esc(e.name)}</div>`).join(''):'<span class="muted">—</span>'}
+    <h3>Материалы</h3>
+    ${media.length?media.map(m=>`<div class="pill">${m.emoji} ${esc(m.title)}</div>`).join(''):'<span class="muted">—</span>'}
+    <div style="margin-top:18px"><button class="btn small" onclick="toast('Добавлено в избранное');renderFav()">В избранное</button></div>`);
+}
+function openPlace(id){
+  const p=byId(DB.places,id);
+  const media=DB.media.filter(m=>m.places.includes(id));
+  const events=DB.events.filter(e=>e.place===id);
+  openModal(`<h2>${p.emoji} ${esc(p.name)}</h2><p class="muted">${esc(p.type)}</p><p>${esc(p.desc)}</p>
+    <h3>События здесь</h3>${events.length?events.map(e=>`<div class="pill">${esc(e.name)}</div>`).join(''):'<span class="muted">—</span>'}
+    <h3>Материалы</h3>${media.length?media.map(m=>`<div class="pill">${m.emoji} ${esc(m.title)}</div>`).join(''):'<span class="muted">—</span>'}`);
+}
+function openMedia(id){
+  const m=byId(DB.media,id);
+  openModal(`<h2>${m.emoji} ${esc(m.title)}</h2>
+    <span class="media-type">${m.type}</span> <span class="pill">${esc(m.canon)}</span>
+    <p class="muted">${esc(m.author)} · ${m.date} · ${m.views} просмотров</p>
+    <p>${esc(m.desc)}</p>
+    <h3>Привязки</h3>
+    ${m.chars.map(id=>`<span class="pill">${esc(nameOf(DB.chars,id))}</span>`).join('')}
+    ${m.places.map(id=>`<span class="pill">${esc(nameOf(DB.places,id))}</span>`).join('')}
+    ${m.events.map(id=>`<span class="pill">${esc(nameOf(DB.events,id))}</span>`).join('')}
+    ${m.tags.map(t=>`<span class="pill">#${esc(t)}</span>`).join('')}`);
+}
+
+/* ================= КАРТА ================= */
+function renderMap(){
+  const pins=[{id:'p1',x:42,y:55},{id:'p2',x:66,y:32},{id:'p3',x:30,y:78},{id:'p4',x:52,y:62}];
+  document.getElementById('map-box').innerHTML=pins.map(pi=>{
+    const p=byId(DB.places,pi.id);
+    return `<div class="map-pin" style="left:${pi.x}%;top:${pi.y}%" onclick="openPlace('${p.id}')">${p.emoji} ${esc(p.name)}</div>`;
+  }).join('');
+  document.getElementById('map-list').innerHTML=DB.places.map(p=>`
+    <div class="card" style="margin-bottom:10px" onclick="openPlace('${p.id}')"><div class="body">
+    <b>${p.emoji} ${esc(p.name)}</b><div class="meta">${esc(p.type)}</div></div></div>`).join('');
+}
+
+/* ================= КАБИНЕТ АВТОРА ================= */
+let selChars=new Set(),selPlaces=new Set(),selEvents=new Set();
+function chipsHTML(arr,set,cls){
+  return arr.map(x=>`<span class="chip ${set.has(x.id)?'on':''}" data-id="${x.id}" data-cls="${cls}">${esc(x.name)}</span>`).join('');
+}
+function renderChips(){
+  document.getElementById('a-chars').innerHTML=chipsHTML(DB.chars,selChars,'char');
+  document.getElementById('a-places').innerHTML=chipsHTML(DB.places,selPlaces,'place');
+  document.getElementById('a-events').innerHTML=chipsHTML(DB.events,selEvents,'event');
+  document.querySelectorAll('#view-author .chip').forEach(ch=>ch.onclick=()=>{
+    const id=ch.dataset.id,cls=ch.dataset.cls;
+    const set=cls==='char'?selChars:cls==='place'?selPlaces:selEvents;
+    set.has(id)?set.delete(id):set.add(id);
+    renderChips();
+  });
+}
+function addMaterial(){
+  const title=document.getElementById('a-title').value.trim();
+  if(!title){toast('Введите название');return}
+  const emoji={Фото:'🖼️',Видео:'🎞️',Аудио:'🎧',Текст:'📜'}[document.getElementById('a-type').value]||'📄';
+  DB.media.unshift({
+    id:'m'+Date.now(),
+    title,
+    type:document.getElementById('a-type').value,
+    author:'Вы (автор)',
+    date:document.getElementById('a-date').value||new Date().toISOString().slice(0,10),
+    chars:[...selChars],places:[...selPlaces],events:[...selEvents],
+    path:document.getElementById('a-path').value,
+    canon:document.getElementById('a-canon').value,
+    tags:document.getElementById('a-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    emoji,views:0,
+    desc:document.getElementById('a-desc').value
+  });
+  selChars.clear();selPlaces.clear();selEvents.clear();
+  document.getElementById('a-title').value='';document.getElementById('a-desc').value='';document.getElementById('a-tags').value='';
+  renderChips();renderAuthorTable();renderMedia();fillSelects();renderHome();
+  toast('Материал опубликован');
+}
+function renderAuthorTable(){
+  document.querySelector('#author-table tbody').innerHTML=DB.media.map(m=>`
+    <tr><td><b>${esc(m.title)}</b></td><td>${m.type}</td>
+    <td>${[...m.chars.map(id=>nameOf(DB.chars,id)),...m.places.map(id=>nameOf(DB.places,id)),...m.events.map(id=>nameOf(DB.events,id))].map(n=>`<span class="pill">${esc(n)}</span>`).join('')||'<span class="muted">—</span>'}</td>
+    <td><span class="pill">${esc(m.canon)}</span></td><td>${m.date}</td>
+    <td><button class="btn ghost small" onclick="delMaterial('${m.id}')">Удалить</button></td></tr>`).join('');
+}
+function delMaterial(id){DB.media=DB.media.filter(m=>m.id!==id);renderAuthorTable();renderMedia();fillSelects();renderHome();toast('Удалено')}
+
+let currentNew='char';
+document.querySelectorAll('#view-author .tab[data-new]').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('#view-author .tab[data-new]').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');currentNew=t.dataset.new;renderNewForm();
+});
+function renderNewForm(){
+  const f=document.getElementById('new-entity-form');
+  if(currentNew==='char'){
+    f.innerHTML=`<div class="form-grid">
+      <div><label>Имя</label><input id="n-name"></div>
+      <div><label>Роль</label><input id="n-role" placeholder="например: кузнец, ученик"></div>
+      <div><label>Путь</label><select id="n-path"><option>—</option><option>Созидание</option><option>Разрушение</option><option>Двойной</option></select></div>
+      <div><label>Ступень</label><input id="n-level" placeholder="Ступень I"></div>
+      <div class="full"><label>Описание</label><textarea id="n-desc"></textarea></div>
+      <div class="full"><button class="btn" onclick="createEntity('char')">Создать персонажа</button></div></div>`;
+  } else if(currentNew==='place'){
+    f.innerHTML=`<div class="form-grid">
+      <div><label>Название</label><input id="n-name"></div>
+      <div><label>Тип</label><input id="n-type" placeholder="деревня, лес, шахта…"></div>
+      <div class="full"><label>Описание</label><textarea id="n-desc"></textarea></div>
+      <div class="full"><button class="btn" onclick="createEntity('place')">Создать место</button></div></div>`;
+  } else {
+    f.innerHTML=`<div class="form-grid">
+      <div><label>Название</label><input id="n-name"></div>
+      <div><label>Дата (внутримировая)</label><input id="n-date" placeholder="Год 312, весна"></div>
+      <div><label>Место</label><select id="n-place">${DB.places.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div>
+      <div class="full"><label>Описание</label><textarea id="n-desc"></textarea></div>
+      <div class="full"><button class="btn" onclick="createEntity('event')">Создать событие</button></div></div>`;
+  }
+}
+function createEntity(kind){
+  const name=document.getElementById('n-name').value.trim();
+  if(!name){toast('Введите название');return}
+  const desc=document.getElementById('n-desc').value;
+  if(kind==='char'){
+    DB.chars.push({id:'c'+Date.now(),name,role:document.getElementById('n-role').value,path:document.getElementById('n-path').value,level:document.getElementById('n-level').value||'—',desc,emoji:'🧑'});
+  } else if(kind==='place'){
+    DB.places.push({id:'p'+Date.now(),name,type:document.getElementById('n-type').value||'—',desc,emoji:'📍'});
+  } else {
+    DB.events.push({id:'e'+Date.now(),name,date:document.getElementById('n-date').value,place:document.getElementById('n-place').value,chars:[],desc});
+  }
+  renderChips();renderCatalog();renderHome();fillSelects();renderNewForm();
+  toast('Сущность создана');
+}
+
+/* ================= ЧИТАТЕЛЬ ================= */
+function renderFav(){
+  document.getElementById('fav-chips').innerHTML=DB.chars.slice(0,2).map(c=>`<span class="pill">${esc(c.name)}</span>`).join('')+'<span class="pill">Шахта у Серой скалы</span>';
+}
+
+/* ================= ИНИЦИАЛИЗАЦИЯ ================= */
+function init(){
+  fillSelects(); renderHome(); renderMedia(); renderCatalog(); renderChips(); renderAuthorTable(); renderNewForm(); renderFav();
+  document.getElementById('a-date').value=new Date().toISOString().slice(0,10);
+}
+init();
+</script>
+</body>
+</html>
